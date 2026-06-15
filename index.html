@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Convite Minecraft</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Courier New", monospace;
+      background:
+        linear-gradient(#7ec8ff 0 45%, #5fb957 45% 70%, #6b3f22 70% 100%);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2b1b0f;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(45deg, rgba(255,255,255,.08) 25%, transparent 25%),
+        linear-gradient(-45deg, rgba(255,255,255,.08) 25%, transparent 25%);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+
+    .world {
+      width: min(92vw, 720px);
+      background: #d8c08a;
+      border: 6px solid #3b2615;
+      box-shadow:
+        0 0 0 6px #7b4a24,
+        10px 10px 0 rgba(0,0,0,.25);
+      padding: 28px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .grass {
+      height: 34px;
+      background:
+        linear-gradient(90deg, #3fa33f 25%, #4fbd4f 25% 50%, #2f8c2f 50% 75%, #57c957 75%);
+      background-size: 64px 34px;
+      border: 4px solid #2b1b0f;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(28px, 6vw, 48px);
+      text-shadow: 3px 3px 0 #8f6b3f;
+      color: #2f5f2f;
+    }
+
+    p {
+      font-size: clamp(16px, 3vw, 21px);
+      line-height: 1.5;
+      margin: 10px auto 22px;
+      max-width: 590px;
+      font-weight: bold;
+    }
+
+    .card {
+      background: #f3dfaa;
+      border: 5px solid #4b2f18;
+      padding: 18px;
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,.25);
+    }
+
+    .buttons {
+      position: relative;
+      height: 120px;
+      margin-top: 24px;
+    }
+
+    button {
+      font-family: inherit;
+      font-size: 20px;
+      font-weight: bold;
+      border: 4px solid #21160c;
+      padding: 14px 28px;
+      cursor: pointer;
+      box-shadow: 5px 5px 0 rgba(0,0,0,.35);
+      transition: transform .1s, left .2s, top .2s;
+      image-rendering: pixelated;
+    }
+
+    button:active {
+      transform: translate(4px, 4px);
+      box-shadow: 1px 1px 0 rgba(0,0,0,.35);
+    }
+
+    #yesBtn {
+      background: #58c957;
+      color: #102b10;
+      position: absolute;
+      left: 22%;
+      top: 28px;
+    }
+
+    #noBtn {
+      background: #c55a4d;
+      color: #2b0f0f;
+      position: absolute;
+      left: 58%;
+      top: 28px;
+    }
+
+    .creeper {
+      font-size: 44px;
+      margin-bottom: 6px;
+      animation: bounce 1.2s infinite alternate;
+    }
+
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-8px); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .invite-form {
+      margin-top: 20px;
+      padding: 20px;
+      background: #b58b50;
+      border: 5px solid #3b2615;
+      animation: pop .35s ease-out;
+    }
+
+    @keyframes pop {
+      from {
+        transform: scale(.8);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 12px 0 6px;
+      font-size: 18px;
+    }
+
+    input {
+      width: min(100%, 300px);
+      padding: 12px;
+      font-size: 17px;
+      font-family: inherit;
+      border: 4px solid #2b1b0f;
+      background: #fff1c7;
+    }
+
+    #confirmBtn {
+      margin-top: 18px;
+      background: #6ab04c;
+      color: #102b10;
+    }
+
+    .message {
+      margin-top: 16px;
+      font-size: 19px;
+      font-weight: bold;
+      color: #183d18;
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .block {
+      position: fixed;
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(0,0,0,.35);
+      z-index: 1;
+      opacity: .9;
+    }
+
+    .block.one {
+      background: #7b4a24;
+      left: 6%;
+      bottom: 9%;
+    }
+
+    .block.two {
+      background: #4fbd4f;
+      left: 12%;
+      bottom: 14%;
+    }
+
+    .block.three {
+      background: #777;
+      right: 9%;
+      bottom: 12%;
+    }
+
+    .block.four {
+      background: #5b3a1d;
+      right: 15%;
+      bottom: 7%;
+    }
+
+    @media (max-width: 520px) {
+      .world {
+        padding: 18px;
+      }
+
+      .buttons {
+        height: 150px;
+      }
+
+      #yesBtn {
+        left: 8%;
+      }
+
+      #noBtn {
+        left: 54%;
+      }
+
+      button {
+        font-size: 17px;
+        padding: 12px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="block one"></div>
+  <div class="block two"></div>
+  <div class="block three"></div>
+  <div class="block four"></div>
+
+  <main class="world">
+    <div class="grass"></div>
+
+    <div class="card">
+      <div class="creeper">🌱⛏️💚</div>
+
+      <h1>Convite Minecraft</h1>
+
+      <p>
+        Você aceita criar um mundo comigo, construir uma casinha fofa,
+        minerar diamantes e tentar derrotar o Dragão do Fim?
+      </p>
+
+      <div class="buttons">
+        <button id="yesBtn">Sim 💎</button>
+        <button id="noBtn">Não 🧨</button>
+      </div>
+
+      <section id="formArea" class="invite-form hidden">
+        <h2>Yeeey! Mundo criado com sucesso 🌎</h2>
+        <p>Agora escolha a data e a hora da nossa aventura:</p>
+
+        <label for="date">Data</label>
+        <input type="date" id="date" />
+
+        <label for="time">Hora</label>
+        <input type="time" id="time" />
+
+        <br />
+
+        <button id="confirmBtn">Confirmar aventura ⚔️</button>
+
+        <div id="finalMessage" class="message"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const formArea = document.getElementById("formArea");
+    const confirmBtn = document.getElementById("confirmBtn");
+    const finalMessage = document.getElementById("finalMessage");
+
+    function moveNoButton() {
+      const padding = 20;
+      const maxX = window.innerWidth - noBtn.offsetWidth - padding;
+      const maxY = window.innerHeight - noBtn.offsetHeight - padding;
+
+      const x = Math.random() * (maxX - padding) + padding;
+      const y = Math.random() * (maxY - padding) + padding;
+
+      noBtn.style.position = "fixed";
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top = `${y}px`;
+      noBtn.style.zIndex = "20";
+    }
+
+    noBtn.addEventListener("mouseenter", moveNoButton);
+    noBtn.addEventListener("touchstart", function(event) {
+      event.preventDefault();
+      moveNoButton();
+    });
+
+    noBtn.addEventListener("click", function(event) {
+      event.preventDefault();
+      moveNoButton();
+    });
+
+    yesBtn.addEventListener("click", function() {
+      formArea.classList.remove("hidden");
+      launchConfetti();
+      yesBtn.textContent = "Aceito! 💚";
+      formArea.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+
+    confirmBtn.addEventListener("click", function() {
+      const date = document.getElementById("date").value;
+      const time = document.getElementById("time").value;
+
+      if (!date || !time) {
+        finalMessage.textContent = "Escolha a data e a hora primeiro, minerador(a)! ⛏️";
+        return;
+      }
+
+      const formattedDate = new Date(date + "T00:00:00").toLocaleDateString("pt-BR");
+
+      finalMessage.innerHTML = `
+        Combinado! No dia <strong>${formattedDate}</strong> às <strong>${time}</strong>,
+        vamos criar nosso mundo, construir nossa casa e enfrentar o Dragão do Fim 🐉💚
+      `;
+
+      launchConfetti();
+    });
+
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    let pieces = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function launchConfetti() {
+      pieces = [];
+
+      const colors = [
+        "#58c957",
+        "#3fa33f",
+        "#7b4a24",
+        "#b58b50",
+        "#6ec6ff",
+        "#f3dfaa",
+        "#777777"
+      ];
+
+      for (let i = 0; i < 160; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * -canvas.height,
+          size: Math.random() * 9 + 5,
+          speed: Math.random() * 4 + 2,
+          rotation: Math.random() * 360,
+          rotationSpeed: Math.random() * 8 - 4,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+      }
+
+      animateConfetti();
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      pieces.forEach((piece) => {
+        piece.y += piece.speed;
+        piece.rotation += piece.rotationSpeed;
+
+        ctx.save();
+        ctx.translate(piece.x, piece.y);
+        ctx.rotate(piece.rotation * Math.PI / 180);
+        ctx.fillStyle = piece.color;
+        ctx.fillRect(-piece.size / 2, -piece.size / 2, piece.size, piece.size);
+        ctx.restore();
+      });
+
+      pieces = pieces.filter(piece => piece.y < canvas.height + 30);
+
+      if (pieces.length > 0) {
+        requestAnimationFrame(animateConfetti);
+      }
+    }
+  </script>
+</body>
+</html>
